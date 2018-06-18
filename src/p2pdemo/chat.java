@@ -12,6 +12,7 @@ import java.net.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
@@ -196,6 +197,14 @@ public class chat extends javax.swing.JFrame implements Runnable {
         });
     }
 
+    public JTextArea getChatField() {
+        return chatField;
+    }
+
+    public JTextField getIpTextField() {
+        return ipTextField;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea chatField;
     private javax.swing.JTextField ipTextField;
@@ -210,18 +219,10 @@ public class chat extends javax.swing.JFrame implements Runnable {
     @Override
     public void run() {
         try {
-            ServerSocket clientServer = new ServerSocket(9090);
-            Socket client;
-            MessaggePacket recibed;
+            ServerSocket serverSocket = new ServerSocket(9090);
             while(true){
-                client = clientServer.accept();
-                ObjectInputStream inputData = new ObjectInputStream(client.getInputStream());
-                try {
-                    recibed = (MessaggePacket) inputData.readObject();
-                    this.chatField.append("\n Somebody: " + recibed.getMessage());
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(chat.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                Socket client = serverSocket.accept();
+                new ServerThread(client,this).start();
             }
             
         } catch (IOException ex) {
